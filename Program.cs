@@ -148,27 +148,32 @@ public static class Program
         }
     }
 
-    // a utility method that creates Roslyn compilation
-    // for the passed code. 
-    // The compilation references the collection of 
-    // passed "references" arguments plus
-    // the mscore library (which is required for the basic
-    // functionality).
-    private static CSharpCompilation CreateCompilationWithMscorlib
+        // a utility method that creates Roslyn compilation
+        // for the passed code. 
+        // The compilation references the collection of 
+        // passed "references" arguments plus
+        // the mscore library (which is required for the basic
+        // functionality).
+        //IEnumerable<MetadataReference> references: A collection of additional assembly references to include during compilation,
+        //e.g., external libraries the code depends on.
+        private static CSharpCompilation CreateCompilationWithMscorlib
     (
         string assemblyOrModuleName,
         string code,
         CSharpCompilationOptions compilerOptions = null,
         IEnumerable<MetadataReference> references = null)
     {
-        // create the syntax tree
+        // create the syntax tree of the input code
+        //A syntax tree represents the structure of the code,
+        //including all tokens and nodes (e.g., methods, variables).
         SyntaxTree syntaxTree = SyntaxFactory.ParseSyntaxTree(code, null, "");
 
         // get the reference to mscore library
+        // This is needed for fundamental types like string, int, etc.
         MetadataReference mscoreLibReference = 
-            AssemblyMetadata
-                .CreateFromFile(typeof(string).Assembly.Location)
-                .GetReference();
+        AssemblyMetadata
+            .CreateFromFile(typeof(string).Assembly.Location)
+            .GetReference();
 
         // create the allReferences collection consisting of 
         // mscore reference and all the references passed to the method
@@ -180,6 +185,7 @@ public static class Program
         }
 
         // create and return the compilation
+        // generates a compilation object.
         CSharpCompilation compilation = CSharpCompilation.Create
         (
             assemblyOrModuleName,
@@ -200,6 +206,8 @@ public static class Program
         this Compilation compilation
     )
     {
+        //temporarily hold the emitted binary data in memory.
+        //This avoids the need to write to the file system.
         using (var stream = new MemoryStream())
         {
             // emit result into a stream
